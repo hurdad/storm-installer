@@ -1,10 +1,10 @@
 Name: apache-storm-service
-Version: 0.9.4
+Version: 1.1.1
 Release: 1%{?dist}
 Summary: Storm Complex Event Processing	Daemon Package
 Group: Applications/Internet
 License: Apache License Version 2.0
-Source: https://github.com/acromusashi/storm-installer/apache-storm-service-0.9.4.tgz
+Source: https://github.com/acromusashi/storm-installer/apache-storm-service.tar.gz
 URL: https://storm.apache.org/
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 Requires: apache-storm
@@ -28,7 +28,7 @@ getent passwd storm >/dev/null || \
 exit 0
 
 %prep
-%setup -q
+%setup -q -n apache-storm-service
 
 # This SPEC build is Only Packaging.
 %build
@@ -36,24 +36,19 @@ exit 0
 %install
 
 # Copy the storm file to the right places
-%{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
 %{__mkdir_p} %{buildroot}%{_initddir}/
-%{__mkdir_p} %{buildroot}%{_localstatedir}/run/storm
 
 %{__cp} init.d/* %{buildroot}%{_initddir}/
 %{__chmod} +x  %{buildroot}%{_initddir}/*
-%{__cp} sysconfig/storm %{buildroot}%{_sysconfdir}/sysconfig/storm
 
 %files 
 %defattr(-,root,root,-)
-%{_sysconfdir}/sysconfig/storm
 %{_initddir}/storm-drpc
 %{_initddir}/storm-logviewer
 %{_initddir}/storm-nimbus
 %{_initddir}/storm-supervisor
 %{_initddir}/storm-ui
-%defattr(-,storm,storm,-)
-/var/run/storm
+%{_initddir}/storm-pacemaker
 
 %clean
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
@@ -65,11 +60,13 @@ if [ "$1" = "0" ]; then
     /sbin/service storm-supervisor stop
     /sbin/service storm-drpc stop
     /sbin/service storm-logviewer stop
+    /sbin/service storm-pacemaker stop
     /sbin/chkconfig storm-ui off
     /sbin/chkconfig storm-nimbus off
     /sbin/chkconfig storm-supervisor off
     /sbin/chkconfig storm-drpc off
     /sbin/chkconfig storm-logviewer off
+    /sbin/chkconfig storm-pacemaker off
 fi
 exit 0
 

@@ -1,11 +1,15 @@
+%define __jar_repack %{nil} 
+# Turn off the brp-python-bytecompile script
+%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
+
 Name: apache-storm	
-Version: 0.9.4
+Version: 1.1.1
 Release: 1%{?dist}
 Summary: Storm Complex Event Processing	
 Group: Applications/Internet
 License: Apache License Version 2.0
 URL: https://storm.apache.org/
-Source: http://www.apache.org/dyn/closer.cgi/storm/apache-storm-0.9.4/apache-storm-0.9.4.tar.gz
+Source: http://apache.mirrors.pair.com/storm/apache-storm-1.1.1/apache-storm-1.1.1.tar.gz
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 Requires(pre): shadow-utils
 %description
@@ -48,7 +52,7 @@ echo "" >> %{buildroot}/opt/storm-%{version}/conf/storm.yaml
 echo "storm.local.dir: \"/opt/storm\"" >> %{buildroot}/opt/storm-%{version}/conf/storm.yaml
 
 #update logback config
-sed -i -e 's/${logfile\.name}/${storm.id:-storm}-${logfile.name}/g' %{buildroot}/opt/storm-%{version}/logback/cluster.xml
+sed -i -e 's/${logfile\.name}/${storm.id:-storm}-${logfile.name}/g' %{buildroot}/opt/storm-%{version}/log4j2/cluster.xml
 
 # Form a list of files for the files directive
 echo $(cd %{buildroot} && find . -type f | cut -c 2-) | tr ' ' '\n' > files.txt
